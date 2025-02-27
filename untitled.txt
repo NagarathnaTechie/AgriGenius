@@ -1,0 +1,159 @@
+import pandas as pd
+import numpy as np
+df = pd.read_csv('crop_recommendation.csv')
+df.head()
+df.isnull().sum()
+df.duplicated().sum()
+corr = df.drop(columns = [df.columns[-1]]).corr()
+corrimport seaborn as sns
+map = sns.heatmap(corr, annot= True, cbar = True, cmap = 'coolwarm')
+map
+import matplotlib.pyplot as plt
+sns.distplot(df['N'])
+plt.show()
+# List of columns to visualize
+columns = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']
+
+# Create a plot for each column
+for col in columns:
+    sns.displot(df[col]) 
+    plt.title(f'Distribution of {col}')
+    plt.xlabel(col)
+    plt.ylabel('Frequency')
+    plt.show()
+from pandas.plotting import scatter_matrix
+scatter_matrix(df)
+plt.show()
+df['label'].value_counts()
+df['label'].value_counts().info()
+df_dict = {
+    'rice': 1,
+    'maize':2,
+    'jute' :3,
+    'cotton':4,
+    'coconut' :5,
+    'papaya' :6,
+    'orange' :7,
+    'apple' :8,
+    'muskmelon':9, 
+    'watermelon' :10,
+    'grapes':11,
+    'mango':12,
+    'banana':13,
+    'pomegranate':14, 
+    'lentil':15,  
+    'blackgram':16,  
+    'mungbean' :17,
+    'mothbeans' :18,
+    'pigeonpeas' :19,
+    'kidneybeans':20,
+    'chickpea':21,
+    'coffee':22
+} 
+df['df_num'] = df['label'].map(df_dict)
+df['label'].value_counts()
+df.drop('label', axis = 1, inplace= True)
+df.head()
+x = df.drop('df_num', axis =1)
+y = df['df_num']
+x.shape
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x,y, test_size=0.2, random_state = 42)
+from sklearn.preprocessing import MinMaxScaler
+ms = MinMaxScaler()
+
+ms.fit(x_train)
+x_train = ms.transform(x_train)
+x_test = ms.transform(x_test)
+from sklearn.preprocessing import StandardScaler
+sc = StandardScaler()
+
+sc.fit(x_train) 
+# The fit method calculates the mean and standard deviation of the training data.
+x_train = sc.transform(x_train)
+x_test = sc.transform(x_test)
+# This code is designed to train and evaluate several machine learning classification models 
+# on the same dataset and compare their accuracies.
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import ExtraTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import BaggingClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.metrics import accuracy_score
+
+#create instances of all models
+models = {
+    'Logistic Regression' : LogisticRegression(),
+    'Naive Bayes' : GaussianNB(),
+    'Support Vector Machine' : SVC(),
+    'K-Nearest Neighbors' : KNeighborsClassifier(), 
+    'Decision Tree' : DecisionTreeClassifier(), 
+    'Extra Trees' : ExtraTreeClassifier(), 
+    'Random Forest' : RandomForestClassifier(), 
+    'Bagging' : BaggingClassifier(), 
+    'Gradient Boosting' : GradientBoostingClassifier(), 
+    'AdaBoost' : AdaBoostClassifier(), 
+}
+
+for name, md in models.items():
+    md.fit(x_train, y_train) # Train the model on the training data
+    ypred = md.predict(x_test) #This uses the trained model to make predictions on the test data
+
+    print(f"{name} with accuracy : {accuracy_score(y_test, ypred)}")
+rfc = RandomForestClassifier()
+rfc.fit(x_train, y_train)
+ypred = rfc.predict(x_test)
+accuracy_score(y_test,ypred)    
+def recommendation(N,P,k,temperature,humidity,ph,rainfal):
+    features = np.array([[N,P,k,temperature,humidity,ph,rainfal]])
+    # transformed_features = ms.fit_transform(features)
+    # transformed_features = sc.fit_transform(transformed_features)
+    transformed_features = ms.transform(features)
+    transformed_features = sc.transform(transformed_features)
+    prediction = rfc.predict(transformed_features).reshape(1,-1)
+    
+    return prediction[0] 
+
+N = 90
+P = 42
+K = 43
+temperature = 20
+humidity = 82
+ph = 6.5
+rainfall = 200
+
+predict = recommendation(N,P,K,temperature,humidity,ph,rainfall)
+
+df_dict = { 1:'Rice',
+    2: 'Maize',
+    3:'Jute',
+    4:'Cotton',
+    5:'Coconut',
+    6:'Papaya',
+    7:'Orange',
+    8:'Apple',
+    9:'Muskmelon', 
+    10:'Watermelon',
+    11:'Grapes',
+    12:'Mango',
+    13:'Banana',
+    14:'Pomegranate', 
+    15:'Lentil',  
+    16:'Blackgram',  
+    17:'Mungbean',
+    18:'Mothbeans',
+    19:'Pigeonpeas',
+    20:'Kidneybeans',
+    21:'Chickpea',
+    22:'Coffee'}
+if predict[0] in df_dict:
+    crop = df_dict[predict[0]]
+    print("{} is the best crop to be cultivated". format(crop))
+else:
+    print("Sorry there is no recommended crop with us to recommend for this environment")  

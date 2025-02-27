@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Prediction System</title>
+    <style>
+        /* General Styles */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background: url('https://images.unsplash.com/photo-1506748686214e9df14e8f8b9d08dc12') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+        }
+
+        header {
+            background-color: rgba(0, 128, 0, 0.8);
+            color: #fff;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            border-bottom: 5px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-title {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            width: 100%;
+            max-width: 700px;
+            margin: 20px auto;
+        }
+
+        .form-wrapper {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 100%;
+            max-width: 450px;
+            border: 3px solid #4CAF50;
+        }
+
+        h2 {
+            color: #4CAF50;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Popup Styles */
+        #popup {
+            display: none;
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background-color: white;
+            padding: 20px;
+            border: 2px solid #4CAF50;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 450px;
+            text-align: center;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        #popup.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        #popup h3 {
+            margin: 0;
+            color: #4CAF50;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        #popup-close {
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        #popup-close:hover {
+            background-color: #45a049;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .form-wrapper {
+                padding: 15px;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="header-title">Crop Prediction System</h1>
+    </header>
+    <div class="main-container">
+        <div class="form-wrapper">
+            <h2>Find the Best Crop for Your Environment</h2>
+            <form id="predictionForm">
+                <div class="form-group">
+                    <label for="Nitrogen">Nitrogen (N in kg/ha):</label>
+                    <input type="number" class="form-control" id="Nitrogen" name="Nitrogen" min="0" required oninput="validateInput(this, 0, Infinity)">
+                </div>
+                <div class="form-group">
+                    <label for="Phosphorus">Phosphorus (P in kg/ha):</label>
+                    <input type="number" class="form-control" id="Phosphorus" name="Phosphorus" min="0" required oninput="validateInput(this, 0, Infinity)">
+                </div>
+                <div class="form-group">
+                    <label for="Potassium">Potassium (K in kg/ha):</label>
+                    <input type="number" class="form-control" id="Potassium" name="Potassium" min="0" required oninput="validateInput(this, 0, Infinity)">
+                </div>
+                <div class="form-group">
+                    <label for="Temperature">Temperature (°C):</label>
+                    <input type="number" class="form-control" id="Temperature" name="Temperature" required oninput="validateInput(this, -50, 50)">
+                </div>
+                <div class="form-group">
+                    <label for="Humidity">Humidity (%):</label>
+                    <input type="number" class="form-control" id="Humidity" name="Humidity" required oninput="validateInput(this, 0, 100)">
+                </div>
+                <div class="form-group">
+                    <label for="Ph">pH:</label>
+                    <input type="number" step="0.1" class="form-control" id="Ph" name="Ph" required oninput="validateInput(this, 0, 14)">                    
+                </div>
+                <div class="form-group">
+                    <label for="Rainfall">Rainfall (mm):</label>
+                    <input type="number" class="form-control" id="Rainfall" name="Rainfall" min="0" required oninput="validateInput(this, 0, Infinity)">
+                </div>                
+                <center><button type="submit" class="btn-primary">Predict Crop</button></center>
+            </form>
+        </div>
+    </div>
+
+    <!-- Popup for prediction result -->
+    <div id="popup">
+        <h3 id="resultMessage">The predicted crop will be displayed here</h3>
+        <div id="popup-close">Close</div>
+    </div>
+
+    <script>               
+        function validateInput(input, min, max) {
+            const value = parseFloat(input.value);
+            if (value < min || value > max) {
+                input.setCustomValidity(`Please enter a value between ${min} and ${max}.`);
+                input.reportValidity();
+            } else {
+                input.setCustomValidity(''); // Reset custom validity
+            }
+        }
+        
+        const form = document.getElementById('predictionForm');
+        const popup = document.getElementById('popup');
+        const resultMessage = document.getElementById('resultMessage');
+        const closePopup = document.getElementById('popup-close');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            if (!form.checkValidity()) {
+                return; // Prevent submission if form is invalid
+            }
+
+            const formData = new FormData(form);
+            const response = await fetch('/predict', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            resultMessage.textContent = `Recommended Crop: ${result.crop}`;
+            popup.classList.add('show');
+            popup.style.display = 'block';
+        });
+
+        closePopup.addEventListener('click', function() {
+            popup.classList.remove('show');
+            popup.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Prediction System</title>
+    <style>
+        /* General Styles */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background: url('https://images.unsplash.com/photo-1506748686214e9df14e8f8b9d08dc12') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+            /* min-height: 100vh; */
+            max-height: 100vh;
+        }
+
+        header {
+            background-color: rgba(0, 128, 0, 0.8);
+            color: #fff;
+            width: 100%;
+            text-align: center;
+            padding: 20px;
+            border-bottom: 5px solid #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-title {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .form-wrapper {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            border: 3px solid #4CAF50;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-wrapper:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            color: #4CAF50;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #4CAF50;
+            outline: none;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+        }
+
+        .btn-primary {
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            background-color: #eaf5e2;
+            color: #4CAF50;
+            font-size: 18px;
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        footer {
+            background-color: rgba(0, 128, 0, 0.8);
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+            font-size: 14px;
+            border-top: 5px solid #fff;
+        }
+
+        .form-control.error {
+            border-color: #e57373;
+            box-shadow: 0 0 8px rgba(244, 67, 54, 0.5);
+        }
+
+        .error-message {
+            color: #e57373;
+            font-size: 14px;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="header-title">Crop Prediction System</h1>
+    </header>
+    <div class="main-container">
+        <div class="form-wrapper">
+            <h2>Find the Best Crop for Your Environment</h2>
+            <form id="predictionForm" action="/predict" method="POST">
+                <div class="form-group">
+                    <label for="Nitrogen">Nitrogen (N in kg/ha):</label>
+                    <input type="number" class="form-control" id="Nitrogen" name="Nitrogen" required>
+                    <div class="error-message" id="NitrogenError">Please enter a valid number.</div>
+                </div>
+                <div class="form-group">
+                    <label for="Phosphorus">Phosphorus (P in kg/ha):</label>
+                    <input type="number" class="form-control" id="Phosphorus" name="Phosphorus" required>
+                    <div class="error-message" id="PhosphorusError">Please enter a valid number.</div>
+                </div>
+                <div class="form-group">
+                    <label for="Potassium">Potassium (K in kg/ha):</label>
+                    <input type="number" class="form-control" id="Potassium" name="Potassium" required>
+                    <div class="error-message" id="PotassiumError">Please enter a valid number.</div>
+                </div>
+                <div class="form-group">
+                    <label for="Temperature">Temperature (°C):</label>
+                    <input type="number" class="form-control" id="Temperature" name="Temperature" required>
+                    <div class="error-message" id="TemperatureError">Please enter a valid number.</div>
+                </div>
+                <div class="form-group">
+                    <label for="Humidity">Humidity (%):</label>
+                    <input type="number" class="form-control" id="Humidity" name="Humidity" required>
+                    <div class="error-message" id="HumidityError">Please enter a valid number.</div>
+                </div>
+                <div class="form-group">
+                    <label for="Ph">pH:</label>
+                    <input type="number" step="0.1" class="form-control" id="Ph" name="Ph" required>
+                    <div class="error-message" id="PhError">Please enter a valid number.</div>
+                </div>
+                <div class="form-group">
+                    <label for="Rainfall">Rainfall (mm):</label>
+                    <input type="number" class="form-control" id="Rainfall" name="Rainfall" required>
+                    <div class="error-message" id="RainfallError">Please enter a valid number.</div>
+                </div>
+                <center><button type="submit" class="btn-primary">Predict Crop</button></center>
+            </form>
+            <div id="resultContainer">
+                <!-- {% if result %} -->
+                    <div class="result">
+                        <!-- {{ result }} -->
+                    </div>
+                <!-- {% endif %} -->
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2024 Crop Prediction System. All rights reserved.</p>
+    </footer>
+</body>
+</html>
