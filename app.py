@@ -10,7 +10,7 @@ model = joblib.load('random_forest_model.pkl')
 sc = joblib.load('standard_scaler.pkl')
 ms = joblib.load('minmaxscaler.pkl')
 
-# Define the crop dictionary
+# Define crop dictionary
 df_dict = {
     1: 'Rice', 2: 'Maize', 3: 'Jute', 4: 'Cotton', 5: 'Coconut',
     6: 'Papaya', 7: 'Orange', 8: 'Apple', 9: 'Muskmelon', 10: 'Watermelon',
