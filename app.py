@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 import joblib
-import numpy as np
+import numpy as 
+
+
 
 # Initialize Flask app
 app = Flask(__name__)
