@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import joblib
 import numpy as np
 
-# Initialize Flask 
+# Initialize Flask model
 app = Flask(__name__)
 
 # Load the saved models and scalers
