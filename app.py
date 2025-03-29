@@ -3,8 +3,6 @@ import joblib
 import numpy as np
 
 
-
-
 # Initialize Flask model
 app = Flask(__name__)
 
